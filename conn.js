@@ -1,5 +1,6 @@
+require('dotenv').config(); 
 const mongoose = require('mongoose');
-const DB = 'mongodb+srv://Shivam_enterprise:1234567890@cluster0.mmutnua.mongodb.net/<database>?retryWrites=true&w=majority'; // Replace with your MongoDB connection string
+const DB = process.env.DB_CONNECTION_STRING;
 
 mongoose.connect(DB, {
   useNewUrlParser: true,
