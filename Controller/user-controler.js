@@ -122,7 +122,7 @@ const order = async (req, res, next) => {
         totalAmount,
         orderDate,
       });
-  
+      
       // Save the order to the database
       await order.save();
   
@@ -253,7 +253,7 @@ const sentOTP = async (req, res, next) => {
     }
 
     // Generate a user token
-    const userToken = jwt.sign({ userId: user._id, role: 'user' }, jwtSecret, { expiresIn: '1h' });
+    
 
     const loginData = new Login({
       number,
@@ -261,12 +261,8 @@ const sentOTP = async (req, res, next) => {
     });
 
     await loginData.save();
-    
-    // Set the user token in localStorage
-   
 
-    // Send the token in the JSON response to the frontend for regular users
-    return res.status(201).json({ token: userToken, message: 'Login successful!' });
+    return res.status(201).json({ message: 'Login successful!' });
   } catch (err) {
     console.error('Error occurred during login:', err);
     return next(err);
