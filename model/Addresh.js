@@ -21,6 +21,11 @@ const AddressSchema = new mongoose.Schema({
     type: String, // You can use String or Number based on your use case
     required: true,
   },
+  user: {
+    type: Number,
+    required: true,
+    // Make sure this is set to true
+},
 });
 
 // Create the Address model

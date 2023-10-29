@@ -16,6 +16,7 @@ const jwtKey="jwt";
 const Order = require('../model/order')
 const Profiles = require('../model/profile.js');
 const localStorage = require('localStorage')
+const Addtocart = require('../model/addtocart')
 
 
 
@@ -23,6 +24,7 @@ const localStorage = require('localStorage')
 
 const fast2sms = require('fast2sms');
 const { Types } = require('mongoose');
+
 
 const signup = async (req, res, next) => {
   const { name, email, number, password } = req.body;
@@ -66,15 +68,60 @@ const signup = async (req, res, next) => {
       res.status(500).json({ message: 'Error updating stock', error });
     }
   };
+  const gaddtocart = async (req, res) => {
+    try {
+      const number = req.params.number;
+      const data = await Addtocart.find({ user:number });
+      // console.log("data = ", data);
+      res.status(200).send({ success: true, data });
+    } catch (error) {
+      res.status(200).send({ success: false, message: "tata" });
+    }
+  };
+
+
+   const getOredr = async (req, res) => {
+    try {
+      const number = req.params.number;
+      const data = await Order.find({ user:number });
+      // console.log("data = ", data);
+      res.status(200).send({ success: true, data });
+    } catch (error) {
+      res.status(200).send({ success: false, message: "tata" });
+    }
+  };
+  const profile= async (req, res) => {
+    try {
+      const number = req.params.number;
+      const data = await Signup.find({ number:number });
+      // console.log("data = ", data);
+      res.status(200).send({ success: true, data });
+    } catch (error) {
+      res.status(200).send({ success: false, message: "tata" });
+    }
+  };
+  const add= async (req, res) => {
+    try {
+      const number = req.params.number;
+      const data = await Addresh.find({ user:number });
+      // console.log("data = ", data);
+      res.status(200).send({ success: true, data });
+    } catch (error) {
+      res.status(200).send({ success: false, message: "tata" });
+    }
+  };
+
+
+  
   const Addres = async (req, res, next) => {
-    const { country, state, city, streetAddress, pincode } = req.body;
+    const { country, state, city, streetAddress, pincode,user } = req.body;
 
   // Perform validation if necessary
-  if (!country || !state || !city || !streetAddress || !pincode) {
+  if (!country || !state || !city || !streetAddress || !pincode || !user) {
     return res.status(400).json({ error: 'All fields are required' });
   }
-  const user = await Addresh.create({ country,state,city,streetAddress,pincode});
- await user.save();
+  const use= await Addresh.create({ country,state,city,streetAddress,pincode,user});
+ await use.save();
  return res.status(200).json({ message: 'successful' });
   // Save the address data to the in-memory storage (you should use a database)
   
@@ -113,26 +160,60 @@ const getAllMovies = async (req, res, next) => {
   }
 };
 const order = async (req, res, next) => {
-    try {
-      const {user,product, quantity,totalAmount, orderDate } = req.body;
-      const order = new Order({
-        user,
-        product,
-        quantity,
-        totalAmount,
-        orderDate,
-      });
-      
-      // Save the order to the database
-      await order.save();
+
+
+  try {
+    const { product, quantity, totalAmount,user,image} = req.body;
+    console.log(user);
+    const order = new Order({
+      user,
+      product,
+      quantity,
+      totalAmount,
+      image
+    });
+
+    // Save the order to the database
+    await order.save();
+
+    // Save the number in the database
   
-      res.status(201).json(order);
-    } catch (err) {
-      console.error('Error creating order:', err);
-      res.status(500).json({ error: err.message });
-    }
-  };
+
+    res.status(201).json(order);
+  } catch (err) {
+    console.error('Error creating order:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+const addtocart = async (req, res, next) => {
+
+  try {
+    const { product, quantity, totalAmount,user,image,productPrice} = req.body;
+    console.log(user);
+    const order = new Addtocart({
+      user,
+      product,
+      quantity,
+      totalAmount,
+      image,
+      productPrice,
+    });
+
+    // Save the order to the database
+    await order.save();
+
+    // Save the number in the database
   
+
+    res.status(201).json(order);
+  } catch (err) {
+    console.error('Error creating order:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
  
   
   
@@ -253,16 +334,21 @@ const sentOTP = async (req, res, next) => {
     }
 
     // Generate a user token
-    
+    const userToken = jwt.sign({ userId: user._id, role: 'user' }, jwtSecret, { expiresIn: '1h' });
 
     const loginData = new Login({
       number,
+     password,
       userId: user._id,
     });
 
     await loginData.save();
+    
+    // Set the user token in localStorage
+   
 
-    return res.status(201).json({ message: 'Login successful!' });
+    // Send the token in the JSON response to the frontend for regular users
+    return res.status(201).json({ token: userToken, message: 'Login successful!' });
   } catch (err) {
     console.error('Error occurred during login:', err);
     return next(err);
@@ -336,20 +422,16 @@ const verifylogin = async (req, res) => {
   res.send("hi");
 }
 const stripes = async (req, res, next) => {
-  const { paymentMethodId } = req.body;
-
   try {
-    // Create a payment intent using the payment method ID
+    const { amount, currency, payment_method_types } = req.body;
+
     const paymentIntent = await stripe.paymentIntents.create({
-      payment_method: paymentMethodId,
-      amount: 1000, // Replace with the actual amount to charge (in cents or smallest currency unit)
-      currency: 'usd', // Replace with your preferred currency
-      confirm: true,
+      amount:amount,
+      currency: currency,
+      payment_method_types: payment_method_types,
     });
 
-    // Handle successful payment or error responses
-    // You can customize the response as needed
-    res.status(200).json({ message: 'Payment completed successfully!' });
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -357,5 +439,5 @@ const stripes = async (req, res, next) => {
 
 
 
-module.exports = { signup, verifyOTP,login, sentOTP,getAllMovies,Products,stripes,verifylogin,verificationToken,Addres,order,Profile,buy,updateProfileByUserId
+module.exports = { profile,addtocart,gaddtocart,signup,getOredr,add,verifyOTP,login, sentOTP,getAllMovies,Products,stripes,verifylogin,verificationToken,Addres,order,Profile,buy,updateProfileByUserId
 };

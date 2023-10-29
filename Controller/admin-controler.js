@@ -92,7 +92,7 @@ const addProduct = async (req, res, next) => {
   };
   const returnOrder = async (req, res, next) => {
     try {
-      const orderId = req.params.orderId;
+      const orderId = req.params.productId;
   
       // Check if the order with the given orderId exists
       const order = await Order.findById(orderId);
@@ -102,12 +102,12 @@ const addProduct = async (req, res, next) => {
       }
   
       // Check if the order is already canceled
-      if (order.status === 'return') {
+      if (order.status === 'Return') {
         return res.status(400).json({ error: 'Order is already return' });
       }
   
       // Update the order status to "canceled"
-      order.status = 'return';
+      order.status = 'Return';
       await order.save();
   
       res.status(200).json({ message: 'Order return successfully' });
@@ -119,7 +119,7 @@ const addProduct = async (req, res, next) => {
 
   const cancelOrder = async (req, res) => {
     try {
-      const orderId = req.params.orderId;
+      const orderId = req.params.productId;
   
       // Check if the order with the given orderId exists
       const order = await Order.findById(orderId);
@@ -129,12 +129,12 @@ const addProduct = async (req, res, next) => {
       }
   
       // Check if the order is already canceled
-      if (order.status === 'canceled') {
+      if (order.status === 'Cancel') {
         return res.status(400).json({ error: 'Order is already canceled' });
       }
   
       // Update the order status to "canceled"
-      order.status = 'canceled';
+      order.status = 'Cancel';
       await order.save();
   
       res.status(200).json({ message: 'Order canceled successfully' });

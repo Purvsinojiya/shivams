@@ -4,28 +4,31 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
   // Add the fields you need for an order
    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true // Make sure this is set to true
+        type: Number,
+        // Make sure this is set to true
     },
       product: {
         type: String,
         ref: 'Product', // Reference to the product in the order
-        required: true,
+        // required: true,
       },
       quantity: {
         type: Number,
-        required: true,
+        // required: true,
       },
       
   totalAmount: {
     type: Number,
-    required: true,
+    // required: true,
   },
   status: {
     type: String,
     enum: ['Pending', 'Return', 'Cancel'],
     default: 'Pending',
+  },
+  image: {
+    type: String,
+   
   },
   // Add any other fields you need for your order model
 }, { timestamps: true }); // Add timestamps for createdAt and updatedAt

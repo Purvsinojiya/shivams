@@ -13,7 +13,7 @@ adminRouter.get('/user',getAllUsers);
 adminRouter.get('/order',Middelware,allorder);
 adminRouter.post('/addstock',Middelware,stockadd);
 adminRouter.get('/stocks',Middelware,allstock);
-adminRouter.put('/order/cancel/:orderId',cancelOrder);
-adminRouter.put('/order/return/:orderId',returnOrder);
+adminRouter.put('/order/cancel/:productId',cancelOrder);
+adminRouter.put('/order/return/:productId',returnOrder);
 
 module.exports = adminRouter;
